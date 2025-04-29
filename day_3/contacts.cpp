@@ -146,3 +146,20 @@ void searchContact(Contact contacts[], int count) {
   }
 
 }
+
+void sortContacts(Contact contacts[], int count) {
+  // Bubble sort to arrange contacts alphabetically by name
+  for (int i = 0; i < count - 1; ++i) {
+    for (int j = 0; j < count - i - 1; ++j) {
+      // Compare names using the > operator (lexicographical order)
+      if (contacts[j].name > contacts[j + 1].name) {
+        // Swap the two contacts if out of order
+        Contact temp = contacts[j];
+        contacts[j] = contacts[j + 1];
+        contacts[j + 1] = temp;
+      }
+    }
+  }
+
+  std::cout << "Contacts sorted alphabetically by name.\n";
+}
