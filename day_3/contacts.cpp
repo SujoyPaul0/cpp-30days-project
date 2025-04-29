@@ -12,6 +12,7 @@ void addContact(Contact contacts[], int &count); // to add new contact
 // for listing all the contacts parameters are same but here count is passed by value which will change in the function but will not affect in the real code
 void listContacts(Contact contacts[], int count);
 void deleteContact(Contact contacts[], int &count);
+void searchContact(Contact contacts[], int count);
 
 int main() {
   // building a structure of contacts with 100 contacts in it
@@ -34,6 +35,9 @@ int main() {
         deleteContact(contacts, count);
         break;
       case 4:
+        searchContact(contacts, count);
+        break;
+      case 5:
         std::cout << "Goodbye!\n";
         break;
       default:
@@ -49,7 +53,9 @@ void showMenu() {
   std::cout << "1. Add Contact\n";
   std::cout << "2. View Contacts\n";
   std::cout << "3. Delete Contacts\n";
-  std::cout << "4. Exit\n";
+  std::cout << "4. Search\n";
+  std::cout << "5. Exit\n";
+
   std::cout << "Enter your choice (1-4): ";
 }
 
@@ -105,4 +111,38 @@ void deleteContact(Contact contacts[], int &count) {
 
   count--; // One less contact now
   std::cout << "Contact deleted successfully.\n";
+}
+
+void searchContact(Contact contacts[], int count) {
+  std::string searchItem;
+
+  // Ignore leftover newline from prev input to prevent getline from skipping
+  std::cin.ignore();
+
+  // Prompt the user for the name they want to search
+  std::cout << "Enter name to search: ";
+
+  // Read the full line of input (to support names with spaces)
+  std::getline(std::cin, searchItem);
+
+  // Flag to track whether any matching contact was found
+  bool found = false;
+
+  // Loop through all contacts
+  for (int i = 0; i < count; i++) {
+    // Check if the search term is part of the contact's name
+    if (contacts[i].name.find(searchItem) != std::string::npos) {
+      // if a match is found, display the contact's details
+      std::cout << "Name: "<< contacts[i].name << ", Phone: " << contacts[i].phone <<"\n";
+
+      // Set found to true so we know at least one match occured
+      found = true;
+    }
+  }
+
+  // If no contact matched the search term
+  if (!found) {
+    std::cout << "No contact found with that name.\n";
+  }
+
 }
