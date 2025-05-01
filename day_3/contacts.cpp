@@ -13,6 +13,17 @@ void addContact(Contact contacts[], int &count); // to add new contact
 void listContacts(Contact contacts[], int count);
 void deleteContact(Contact contacts[], int &count);
 void searchContact(Contact contacts[], int count);
+void sortContacts(Contact contacts[], int count);
+void editContact(Contact contacts[], int count);
+
+// convert strings to lowercase for comparison
+std::string toLower(const std::string& str) {
+  std::string lowerStr = str;
+  for (char& ch: lowerStr) {
+    ch = std::tolower(ch);
+  }
+  return lowerStr;
+}
 
 int main() {
   // building a structure of contacts with 100 contacts in it
@@ -38,6 +49,12 @@ int main() {
         searchContact(contacts, count);
         break;
       case 5:
+        sortContacts(contacts, count);
+        break;
+      case 6:
+        editContact(contacts, count);
+        break;
+      case 7:
         std::cout << "Goodbye!\n";
         break;
       default:
@@ -54,7 +71,9 @@ void showMenu() {
   std::cout << "2. View Contacts\n";
   std::cout << "3. Delete Contacts\n";
   std::cout << "4. Search\n";
-  std::cout << "5. Exit\n";
+  std::cout << "5. Sort Contacts\n";
+  std::cout << "6. Edit Contact\n";
+  std::cout << "7. Exit\n";
 
   std::cout << "Enter your choice (1-4): ";
 }
@@ -152,7 +171,7 @@ void sortContacts(Contact contacts[], int count) {
   for (int i = 0; i < count - 1; ++i) {
     for (int j = 0; j < count - i - 1; ++j) {
       // Compare names using the > operator (lexicographical order)
-      if (contacts[j].name > contacts[j + 1].name) {
+      if (toLower(contacts[j].name) > toLower(contacts[j + 1].name)) {
         // Swap the two contacts if out of order
         Contact temp = contacts[j];
         contacts[j] = contacts[j + 1];
@@ -162,4 +181,57 @@ void sortContacts(Contact contacts[], int count) {
   }
 
   std::cout << "Contacts sorted alphabetically by name.\n";
+}
+
+
+// Function to edit an existing contact
+void editContact(Contact contacts[], int count) {
+  // If there are no contacts, nothing to edit
+  if (count == 0) {
+    std::cout << "No contacts to edit.\n";
+    return;
+  }
+
+  // Show the current list of contacts
+  listContacts(contacts, count);
+
+  int editIndex;
+  // Prompt user to select which contact to edit
+  std::cout << "Enter the contact number to edit (1 to " << count << "): ";
+  std::cin >> editIndex;
+
+  // Validate the input number
+  if (editIndex < 1 || editIndex > count) {
+    std::cout << "Invalid contact number.\n";
+    return;
+  }
+
+  // Clear leftover newline character from the input buffer
+  std::cin.ignore();
+
+  // Convert to 0-based index for internal array access
+  editIndex--;
+
+  // Ask for a new name, showing the current name as a hint
+  std::cout << "Enter new name (leave blank to keep \"" << contacts[editIndex].name << "\"): ";
+  std::string newName;
+  std::getline(std::cin, newName);  // Read full line (including spaces)
+
+  // Ask for a new phone number, showing the current number as a hint
+  std::cout << "Enter new phone (leave blank to keep \"" << contacts[editIndex].phone << "\"): ";
+  std::string newPhone;
+  std::getline(std::cin, newPhone);  // Read full line
+
+  // If user typed a new name, update it
+  if (!newName.empty()) {
+    contacts[editIndex].name = newName;
+  }
+
+  // If user typed a new phone number, update it
+  if (!newPhone.empty()) {
+    contacts[editIndex].phone = newPhone;
+  }
+
+  // Confirm to the user that the contact was updated
+  std::cout << "Contact updated successfully.\n";
 }
