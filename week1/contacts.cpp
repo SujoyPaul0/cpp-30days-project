@@ -1,5 +1,8 @@
 #include <iostream>
 #include <string>
+#include <fstream> // Required to work with file input/output
+#include <sstream> // For using stringstream to parse lines
+#include <string> // For using std::string
 
 struct Contact {
   std::string name;
@@ -15,6 +18,9 @@ void deleteContact(Contact contacts[], int &count);
 void searchContact(Contact contacts[], int count);
 void sortContacts(Contact contacts[], int count);
 void editContact(Contact contacts[], int count);
+void loadContacts(Contact contacts[], int &count);
+void saveContacts(Contact contacts[], int count);
+
 
 // convert strings to lowercase for comparison
 std::string toLower(const std::string& str) {
@@ -29,6 +35,7 @@ int main() {
   // building a structure of contacts with 100 contacts in it
   Contact contacts[100]; // can store up to 100 contacts
   int count = 0;
+  loadContacts(contacts, count); // Load from file at start
   int choice;
 
   do {
@@ -40,6 +47,7 @@ int main() {
         addContact(contacts, count);
         break;
       case 2:
+        loadContacts(contacts, count);
         listContacts(contacts, count);
         break;
       case 3:
@@ -55,12 +63,13 @@ int main() {
         editContact(contacts, count);
         break;
       case 7:
+        saveContacts(contacts, count);
         std::cout << "Goodbye!\n";
         break;
       default:
         std::cout << "Invalid choice.\n";
     }
-  } while (choice != 4);
+  } while (choice != 7);
 
   return 0;
 }
@@ -234,4 +243,64 @@ void editContact(Contact contacts[], int count) {
 
   // Confirm to the user that the contact was updated
   std::cout << "Contact updated successfully.\n";
+}
+
+
+// Function to save all contacts to a file named "contacts.txt"
+
+// Function to save all contacts to a file named "contacts.txt"
+void saveContacts(Contact contacts[], int count) {
+  std::ofstream outFile("contacts.txt"); // Open a file for writing (if the file doesn’t exist, it will be created)
+
+  // Check if the file was successfully opened
+  if (!outFile) {
+    std::cout << "Error opening file for saving contacts.\n";
+    return; // Exit the function if the file can't be opened
+  }
+
+  // Loop through each contact
+  for (int i = 0; i < count; ++i) {
+    // Write the name and phone number to the file separated by a comma
+    outFile << contacts[i].name << "," << contacts[i].phone << "\n";
+  }
+
+  // File will be automatically closed when outFile goes out of scope (end of function)
+  std::cout << "Contacts saved to file successfully.\n";
+}
+
+
+
+// Function to load contacts from the "contacts.txt" file
+void loadContacts(Contact contacts[], int &count) {
+  std::ifstream inFile("contacts.txt"); // Open the file for reading
+
+  // Check if the file was opened successfully
+  if (!inFile) {
+    std::cout << "No saved contacts found.\n"; // File may not exist the first time
+    return; // Exit the function if file can’t be opened
+  }
+
+  std::string line; // A string to hold each line from the file
+
+  count = 0; // Reset the contact count before loading
+
+  // Read the file line by line
+  while (std::getline(inFile, line)) {
+    std::stringstream ss(line); // Create a string stream from the line
+    std::string name, phone;    // Temporary variables to store name and phone
+
+    // Use getline with ',' as the delimiter to extract name and phone
+    std::getline(ss, name, ',');
+    std::getline(ss, phone);
+
+    // Store the data into the contacts array
+    contacts[count].name = name;
+    contacts[count].phone = phone;
+
+    count++; // Increment the contact count
+  }
+
+  std::cout << "Contacts loaded from file successfully.\n";
+
+  // File is automatically closed when inFile goes out of scope
 }
